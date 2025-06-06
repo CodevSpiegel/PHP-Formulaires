@@ -41,7 +41,7 @@ if (!$email) {
 //     die;
 // }
 
-var_dump($_POST["pass"]);
+// var_dump($_POST["pass"]); 
 
 // SI LES MOTS DE PASSE NE CORRESPONDENT PAS OU SI INFERIEUR A 8 CARACTERES
 if ($_POST["pass"] == $_POST["confirm_pass"] && strlen(trim($_POST["pass"])) > 7) {
@@ -53,14 +53,14 @@ if ($_POST["pass"] == $_POST["confirm_pass"] && strlen(trim($_POST["pass"])) > 7
 
     foreach ($passLetters as $passLetter) {
         if (in_array($passLetter, $uppercases)) {
-            echo "<p>Il y a une majuscule</p>";
+            // echo "<p>Il y a une majuscule</p>";
             $checkUppercase = true;
             break;
         }
     }
     foreach ($passLetters as $passLetter) {
         if (in_array($passLetter, $numbers)) {
-            echo "<p>Il y a un chiffre</p>";
+            // echo "<p>Il y a un chiffre</p>";
             $checkNumber = true;
             break;
         }
@@ -75,4 +75,36 @@ if ($_POST["pass"] == $_POST["confirm_pass"] && strlen(trim($_POST["pass"])) > 7
     die;
 }
 
-echo "Bien joué !";
+$file = $_FILES['uploadfile'];
+
+// var_dump($file); 
+
+// Si le fichier a autre chose que 0 en erreur
+if ($file["error"] != 0) {
+    header("Location: ./index.php?error=file");
+    die;
+}
+
+if ($file["size"] < 1 && $file["size"] > 2_000_000) {
+    header("Location: ./index.php?error=file");
+    die;
+}
+
+$allowedExtensions = ["png", "jpg", "jpeg", "gif", "webp", "avif"];
+
+$arrayFilename = explode(".", $file["name"]);
+$extension = strtolower(end($arrayFilename));
+
+if (!in_array($extension, $allowedExtensions)) {
+    header("Location: ./index.php?error=file");
+    die;
+}
+
+$filename = bin2hex(random_bytes(20)) . time() . "." . $extension;
+
+if (move_uploaded_file($file["tmp_name"], "./uploads/$filename") ) {
+    echo "L'image a été importée avec succès !";
+}
+
+// echo $extension;
+// echo "Bien joué !";
